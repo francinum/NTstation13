@@ -1,9 +1,9 @@
 
 //########################## CONTRABAND ;3333333333333333333 -Agouri ###################################################
 
-#define NUM_OF_POSTER_DESIGNS 22 //subtype 0-contraband posters
+#define NUM_OF_POSTER_DESIGNS 32 //subtype 0-contraband posters
 
-#define NUM_OF_POSTER_DESIGNS_LEGIT 21 //subtype 1-corporate approved posters
+#define NUM_OF_POSTER_DESIGNS_LEGIT 35 //subtype 1-corporate approved posters
 
 /obj/item/weapon/contraband
 	name = "contraband item"
@@ -14,7 +14,7 @@
 
 /obj/item/weapon/contraband/poster
 	name = "rolled-up poster"
-	desc = "The poster comes with its own automatic adhesive mechanism, for easy pinning to any vertical surface. Its vulgar themes have marked it as Contraband aboard Nanotrasen? Space Facilities."
+	desc = "The poster comes with its own automatic adhesive mechanism, for easy pinning to any vertical surface. Its vulgar themes have marked it as contraband aboard Nanotrasen space facilities."
 	icon_state = "rolled_poster"
 	var/serial_number = 0
 	var/obj/structure/sign/poster/resulting_poster = null //The poster that will be created is initialised and stored through contraband/poster's constructor
@@ -97,7 +97,7 @@ obj/structure/sign/poster/New(serial,subtype)
 				desc += " A framed shred of a much larger flag, colors bled together and faded from age."
 			if(2)
 				name += " - Atmosia Declaration of Independence"
-				desc += " A relic of a failed rebellion"
+				desc += " A relic of a failed rebellion."
 			if(3)
 				name += " - Fun Police"
 				desc += " A poster condemning the station's security forces."
@@ -148,10 +148,10 @@ obj/structure/sign/poster/New(serial,subtype)
 				desc += " All hail the Communist party!"
 			if(19)
 				name += " - Lamarr"
-				desc += " This poster depicts Lamarr. Probably made by the research director."
+				desc += " This poster depicts Lamarr. Probably made by the Research Director."
 			if(20)
 				name += " - Borg Fancy"
-				desc += " Being fancy can be for any borg, Just need a suit."
+				desc += " Being fancy can be for any borg, just need a suit."
 			if(21)
 				name += " - Borg Fancy v2"
 				desc += " Borg Fancy, Now only taking the most fancy."
@@ -164,9 +164,34 @@ obj/structure/sign/poster/New(serial,subtype)
 			if(24)
 				name += " - C-20r Advertisment"
 				desc += " A poster advertising the Scarborough Arms C-20r."
+			if(25)
+				name += " - Have A Puff"
+				desc += " Who cares about lung cancer when you're high as a kite?"
+			if(26)
+				name += " - Revolver Advertisment"
+				desc += " Because six shots are all you need."
+			if(27)
+				name += " - D-Day Promotional Poster"
+				desc += " A promotional poster for some rapper."
+			if(28)
+				name += " - Stetchkin Pistol Advertisment"
+				desc += " A poster advertising Stetchkin pistols as being 'Classy as fuck'."
+			if(29)
+				name += " - E-sword Rainbow"
+				desc += " All the colors of bloody murder rainbow."
+			if(30)
+				name += " - Red Rum"
+				desc += " Looking at this poster makes you want to kill."
+			if(31)
+				name += " - CC 64K Advertisment"
+				desc += " The latest portable computer from Comrade Computing, with a whole 64kB of ram!"
+			if(32)
+				name += " - Punch Shit"
+				desc += " Fight things for no reason, like a man!"
 			else
 				name += " - Error (subtype 0 serial_number)"
 				desc += " This is a bug, please report the circumstances under which you encountered this poster at https://github.com/NTStation/NTstation13/issues."
+
 	if(subtype == 1)
 		icon_state = "poster[serial_number]_legit"
 		switch(serial_number)
@@ -175,7 +200,7 @@ obj/structure/sign/poster/New(serial,subtype)
 				desc += " A poster glorifying the station's security force."
 			if(2)
 				name += " - Nanotrasen Logo"
-				desc += " A poster depicting the logo of Nanotrasen"
+				desc += " A poster depicting the logo of Nanotrasen."
 			if(3)
 				name += " - Cleanliness"
 				desc += " A poster warning of the dangers of poor hygiene."
@@ -226,7 +251,7 @@ obj/structure/sign/poster/New(serial,subtype)
 				desc += " A poster reprint of some cheap pop art."
 			if(19)
 				name += " - Saftey: Internals"
-				desc += " A poster instructing the viewer to wear internals in enviornments where there is no oxygen or the air has been rendered toxic."
+				desc += " A poster instructing the viewer to wear internals in environments where there is no oxygen or the air has been rendered toxic."
 			if(20)
 				name += " - Saftey: Eye Protection"
 				desc += " A poster instructing the viewer to wear eye protection when dealing with chemicals, smoke, or bright lights."
@@ -235,16 +260,49 @@ obj/structure/sign/poster/New(serial,subtype)
 				desc += " A poster instructing the viewer to report suspicious activity to the security force."
 			if(22)
 				name += " - Report Crimes"
-				desc += " Report Crimes At: 1-800-FUCKING-TERRORISTS or at https://www.sectorthirteen.nt/malconetents."
+				desc += " Report crimes at: 1-800-FUCKING-TERRORISTS or at https://www.sectorthirteen.nt/malconetents."
 			if(23)
 				name += " - Ion Rifle"
 				desc += " A poster displaying an Ion Rifle."
+			if(24)
+				name += " - Foam Force Advertisment"
+				desc += " Foam Force, it's Foam or be Foamed!"
+			if(25)
+				name += " - Cohiba Robusto Advertisment"
+				desc += " Cohiba Robusto, the classy cigar."
+			if(26)
+				name += " - 50th Aniversery Vintage Reprint"
+				desc += " A reprint of a poster from 2504, commemorating the 50th Aniversery of Nanoposters Manufacturing, a subsidary of Nanotrasen."
+			if(27)
+				name += " - Fruit Bowl"
+				desc += " Simple, yet awe inspiring."
+			if(28)
+				name += " - NanoPDA 1000 Advertisment"
+				desc += " A poster advertising the latest PDA from Nanotrasen."
+			if(29)
+				name += " - Space Leauge: The Crimson Sprinter"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(30)
+				name += " - Space Leauge: Particle Man"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(31)
+				name += " - Space Leauge: The Greek Amazon"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(32)
+				name += " - Space Leauge: The Night Walker"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(33)
+				name += " - Space Leauge: Asteroid Corgicatcher"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(34)
+				name += " - Space Leauge: The Jade Flashlight"
+				desc += " A poster showing one of the characters from The Space Leauge."
+			if(35)
+				name += " - Space Leauge: The Guner Eagle"
+				desc += " A poster showing one of the characters from The Space Leauge."
 			else
 				name += " - Error (subtype 1 serial_number)"
 				desc += " This is a bug, please report the circumstances under which you encountered this poster at https://github.com/NTStation/NTstation13/issues."
-	else
-		name += " - Error (subtype/pre-placed poster serial_number generator)"
-		desc += " This is a bug, please report the circumstances under which you encountered this poster at https://github.com/NTStation/NTstation13/issues."
 	..()
 
 obj/structure/sign/poster/attackby(obj/item/I, mob/user)

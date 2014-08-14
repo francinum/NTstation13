@@ -266,6 +266,20 @@ var/list/uplink_items = list()
 	cost = 4
 	excludefrom = list(/datum/game_mode/nuclear)
 
+/datum/uplink_item/stealthy_weapons/chem_pen
+	name = "Chem Pen"
+	desc = "A multiuse air-needle injector disguised as a functional pen, filled with a strong sedative that will knock out targets after a few seconds. Comes with 3 uses and can be refilled with any other chemical of your choice."
+	item = /obj/item/weapon/pen/chem
+	cost = 5
+	excludefrom = list(/datum/game_mode/nuclear) //is this really needed?
+
+/datum/uplink_item/stealthy_weapons/poisonkit
+	name = "Poison Kit"
+	desc = "A box containing 3 bottles of a random poison. The first bottle contains a regular poison, the second bottle contains an utility based poison and the last bottle contains a very dangerous poison."
+	item = /obj/item/weapon/storage/box/syndie_kit/poison
+	cost = 3
+	excludefrom = list(/datum/game_mode/nuclear)
+
 /datum/uplink_item/stealthy_weapons/soap
 	name = "Syndicate Soap"
 	desc = "A sinister-looking surfactant used to clean blood stains to hide murders and prevent DNA analysis. You can also drop it underfoot to slip people."

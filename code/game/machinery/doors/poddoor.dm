@@ -12,6 +12,14 @@
 	density = 0
 	opacity = 0
 
+/obj/machinery/door/poddoor/dark
+	icon = 'icons/obj/doors/blastdoor_dark.dmi'
+
+/obj/machinery/door/poddoor/dark/preopen
+	icon_state = "open"
+	density = 0
+	opacity = 0
+
 
 /obj/machinery/door/poddoor/Bumped(atom/AM)
 	if(density)
@@ -83,8 +91,8 @@
 
 	operating = 0
 
-
-
+/obj/machinery/door/poddoor/CanAStarPass()
+	return !density
 
 /*
 /obj/machinery/door/poddoor/two_tile_hor/open()

@@ -89,12 +89,12 @@ silicate
 	required_reagents = list("radium" = 1, "phosphorus" = 1, "chlorine" = 1)
 	result_amount = 3
 
-//cyanide
-//	name = "Cyanide"
-//	id = "cyanide"
-//	result = "cyanide"
-//	required_reagents = list("hydrogen" = 1, "carbon" = 1, "nitrogen" = 1)
-//	result_amount = 1
+/datum/chemical_reaction/cyanide
+	name = "Cyanide"
+	id = "cyanide"
+	result = "cyanide"
+	required_reagents = list("ehuadol" = 1, "zombiepowder" = 1)
+	result_amount = 2
 
 /datum/chemical_reaction/thermite
 	name = "Thermite"
@@ -343,14 +343,18 @@ silicate
 	name = "Napalm"
 	id = "napalm"
 	result = null
-	required_reagents = list("aluminium" = 1, "plasma" = 1, "sacid" = 1 )
+	required_reagents = list("aluminium" = 1, "plasma" = 1, "sacid" = 1)
 	result_amount = 1
 /datum/chemical_reaction/napalm/on_reaction(var/datum/reagents/holder, var/created_volume)
 	var/turf/simulated/T = get_turf(holder.my_atom)
 	if(istype(T))
-		T.atmos_spawn_air(SPAWN_HEAT | SPAWN_TOXINS, created_volume)
+		T.atmos_spawn_air(SPAWN_HEAT | SPAWN_TOXINS, created_volume*3)
+	var/napalmfiresize = min (MAX_EX_FLAME_RANGE, round(created_volume/4)) //let's not go over the cap
+	if (created_volume >= 20) explosion(get_turf(holder.my_atom),-1,-1,-1, flame_range = napalmfiresize) //double explosion for denser fire... a dedicated fire explosion effect would be nicer
+	explosion(get_turf(holder.my_atom),-1,-1,-1, flame_range = napalmfiresize)
 	holder.del_reagent(id)
 	return
+
 
 /*
 /datum/chemical_reaction/smoke
@@ -422,12 +426,110 @@ silicate
 	required_reagents = list("carpotoxin" = 1, "cryptobiolin" = 1, "copper" = 1)
 	result_amount = 3
 
+/datum/chemical_reaction/chiyanine
+	name = "Chiyanine"
+	id = "chiyanine"
+	result = "chiyanine"
+	required_reagents = list("plasma" = 1, "radium" = 1, "aluminium" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/mizarudol
+	name = "Mizarudol"
+	id = "mizarudol"
+	result = "mizarudol"
+	required_reagents = list("plasma" = 1, "cryptobiolin" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/maizine
+	name = "Maizine"
+	id = "maizine"
+	result = "maizine"
+	required_reagents = list("cryptobiolin" = 1, "mindbreaker" = 1, "chloralhydrate" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/jiutin
+	name = "Jiutin"
+	id = "jiutin"
+	result = "jiutin"
+	required_reagents = list("radium" = 1, "lipozine" = 1, "copper" = 1)
+	result_amount = 4
+
+/datum/chemical_reaction/iwazarudol
+	name = "Iwazarudol"
+	id = "iwazarudol"
+	result = "iwazarudol"
+	required_reagents = list("plasma" = 1, "stoxin" = 1, "silicon" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/fangshenine
+	name = "Fangshenine"
+	id = "fangshenine"
+	result = "fangshenine"
+	required_reagents = list("radium" = 1, "phosphorus" = 1, "aluminium" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/hunzine
+	name = "Hunzine"
+	id = "hunzine"
+	result = "hunzine"
+	required_reagents = list("impedrezene" = 1, "cryptobiolin" = 1, "toxin" = 1)
+	result_amount = 3
+
+/datum/chemical_reaction/synaptidol
+	name = "Synaptidol"
+	id = "synaptidol"
+	result = "synaptidol"
+	required_reagents = list("fuel" = 2, "robustharvestnutriment" = 1)
+	result_amount = 3
+
 /datum/chemical_reaction/mindbreaker
 	name = "Mindbreaker Toxin"
 	id = "mindbreaker"
 	result = "mindbreaker"
 	required_reagents = list("silicon" = 1, "hydrogen" = 1, "anti_toxin" = 1)
 	result_amount = 5
+
+/datum/chemical_reaction/synchrozine
+	name = "Synchroizine"
+	id = "synchrozine"
+	result = "synchrozine"
+	required_reagents = list("blood" = 1, "fuel" = 1, "elatopam" = 1)
+	result_amount = 2
+
+datum/chemical_reaction/penteticacid // stolen from goon
+	name = "Pentetic acid"
+	id = "penteticacid"
+	result = "penteticacid"
+	required_reagents = list("arithrazine" = 1, "anti_toxin" = 2, "plasma" = 1)
+	result_amount = 1
+
+datum/chemical_reaction/almazidone
+	name = "Almazidone"
+	id = "almazidone"
+	result = "almazidone"
+	required_reagents = list("fuel" = 1, "toxin" = 1, "sodiumchloride" = 2)
+	result_amount = 3
+
+datum/chemical_reaction/elatopam
+	name = "Elatopam"
+	id = "elatopam"
+	result = "elatopam"
+	required_reagents = list("virusfood" = 1, "robustharvestnutriment" = 2)
+	result_amount = 4
+
+datum/chemical_reaction/ephedrine
+	name = "Ephedrine"
+	id = "ephedrine"
+	result = "ephedrine"
+	required_reagents = list("sugar" = 1, "almazidone" = 1, "beepskysmash" = 1)
+	result_amount = 2
+
+datum/chemical_reaction/methamphetamine
+	name = "Methamphetamine"
+	id = "methamphetamine"
+	result = "methamphetamine"
+	required_reagents = list("ephedrine" = 5, "hydrogen" = 1, "chlorine" = 1, "plasma" = 1)
+	result_amount = 1
 
 /datum/chemical_reaction/lipozine
 	name = "Lipozine"
@@ -1947,6 +2049,13 @@ datum/chemical_reaction/pestkiller
 	result = "barefoot"
 	required_reagents = list("berryjuice" = 1, "cream" = 1, "vermouth" = 1)
 	result_amount = 3
+
+/datum/chemical_reaction/bathsalts
+	name = "Bath salts"
+	id = "bathsalts"
+	result = "bathsalts"
+	required_reagents = list("enzyme" = 1, "cleaner" = 1, "vodka" = 2)
+	result_amount = 2
 
 
 ////DRINKS THAT REQUIRED IMPROVED SPRITES BELOW:: -Agouri/////

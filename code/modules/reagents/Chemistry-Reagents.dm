@@ -610,7 +610,7 @@ datum
 
 			reaction_turf(var/turf/T, var/volume)
 				src = null
-				if(volume >= 3)
+				if(volume >= 1)
 					if(!istype(T, /turf/space))
 						new /obj/effect/decal/cleanable/greenglow(T)
 						return
@@ -1283,6 +1283,61 @@ datum
 				..()
 				return
 
+		pentetic_acid
+			name = "Pentetic acid"
+			id = "penteticacid"
+			description = "A powerful medicinal acid to combat radiation and toxin damage."
+			reagent_state = LIQUID
+			color = "#604030" // rgb: 96, 64, 48
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				M.radiation = max(M.radiation-5*REM,0)
+				M.reagents.remove_all_type(/datum/reagent/toxin, 1*REM, 0, 1)
+				M.adjustToxLoss(-3*REM)
+				..()
+				return
+
+		almazidone // the name of this is a reference
+			name = "Almazidone"
+			id = "almazidone"
+			description = "Chemically modified salt, basically. Best used to get high."
+			reagent_state = LIQUID
+			color = "#4D5D53" // rgb: 77, 93, 83
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				M.druggy = max(M.druggy, 15)
+				if(isturf(M.loc) && !istype(M.loc, /turf/space))
+					if(M.canmove)
+						if(prob(10)) step(M, pick(cardinal))
+				holder.remove_reagent(src.id, 0.5 * REAGENTS_METABOLISM)
+				if(prob(33))
+					M.take_organ_damage(1*REM, 0)
+				M.adjustOxyLoss(3)
+				if(prob(20)) M.emote("gasp")
+				M.hallucination += 10
+				return
+
+		elatopam // this drug took so much shit to make :^)
+			name = "Elatopam"
+			id = "elatopam"
+			description = "An old drug for burns and bruises. Now it's used to get high."
+			reagent_state = LIQUID
+			color = "#FF4BA4" // rgb: 255, 75, 164
+
+			on_mob_life(var/mob/living/M as mob)
+				if(M.stat == 2.0)
+					return
+				holder.remove_reagent(src.id, 0.5 * REAGENTS_METABOLISM)
+				if(!M) M = holder.my_atom
+				M.heal_organ_damage(0,1*REM)
+				if(M.getBruteLoss() && prob(20)) M.heal_organ_damage(1,0)
+				M.jitteriness = max(M.jitteriness-5,0)
+				if(prob(80)) M.adjustBrainLoss(1*REM)
+				M.druggy = max(M.druggy, 15)
+				return
+
 //////////////////////////Poison stuff///////////////////////
 
 		toxin
@@ -1306,7 +1361,7 @@ datum
 			description = "A powerful poison derived from certain species of mushroom."
 			reagent_state = LIQUID
 			color = "#792300" // rgb: 121, 35, 0
-			toxpwr = 1
+			toxpwr = 1.5
 
 		toxin/mutagen
 			name = "Unstable mutagen"
@@ -1314,7 +1369,7 @@ datum
 			description = "Might cause unpredictable mutations. Keep away from children."
 			reagent_state = LIQUID
 			color = "#13BC5E" // rgb: 19, 188, 94
-			toxpwr = 0
+			toxpwr = 2
 
 			reaction_mob(var/mob/living/carbon/M, var/method=TOUCH, var/volume)
 				if(!..())	return
@@ -1330,9 +1385,19 @@ datum
 			on_mob_life(var/mob/living/carbon/M)
 				if(!istype(M))	return
 				if(!M) M = holder.my_atom
-				M.apply_effect(5,IRRADIATE,0)
-				..()
+				if(prob(20))
+					if(prob(98))	randmutb(M)
+					else			randmutg(M)
+					domutcheck(M, null)
+					updateappearance(M)
+				holder.remove_reagent(src.id, 1 * REAGENTS_METABOLISM)
 				return
+			reaction_turf(var/turf/T, var/volume)
+				src = null
+				if(volume >= 1)
+					if(!istype(T, /turf/space))
+						new /obj/effect/decal/cleanable/greenglow(T)
+						return
 
 		toxin/plasma
 			name = "Plasma"
@@ -1731,6 +1796,352 @@ datum
 			color = "#7F8400" // rgb: 127, 132, 0
 			toxpwr = 0.5
 
+		toxin/hunzine
+			name = "Hunzine"
+			id = "hunzine"
+			description = "A poison targeting various parts of the body. Known to cause toxic damage to tissue, damage to the brain and severe confusion."
+			reagent_state = SOLID
+			color = "#7F8400" // rgb: 127, 132, 0
+			toxpwr = 1
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				M.jitteriness = max(M.jitteriness-5,0)
+				M.Dizzy(1)
+				if(!M.confused) M.confused = 1
+				M.confused = max(M.confused, 20)
+				if(prob(80)) M.adjustBrainLoss(1.5*REM)
+				if(prob(50)) M.drowsyness = max(M.drowsyness, 3)
+				if(prob(10)) M.emote("drool")
+				..()
+				return
+
+		toxin/chiyanine
+			name = "Chiyanine"
+			id = "chiyanine"
+			description = "A delayed poison that will cause severe poisoning several minutes after consumption."
+			reagent_state = LIQUID
+			color = "#C7E46E" // rgb: 199, 228, 110
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				if(!data) data = 1
+				switch(data)
+					if(119)
+						M.Weaken(4)
+						M << "<span class='danger'>You suddenly feel an intense pain.</span>"
+					if(120 to INFINITY)
+						holder.remove_reagent(src.id, 0.6*REM)
+						M.adjustToxLoss(4*REM)
+						if(prob(15)) //random chance to vomit
+							M.Stun(4)
+							M.visible_message("<span class='danger'>[M] throws up!</span>")
+							M.take_organ_damage(2*REM, 0)
+							M.nutrition -= 20
+							M.adjustToxLoss(-2)
+							var/turf/pos = get_turf(M)
+							pos.add_vomit_floor(M)
+							pos.add_blood_floor(M) //nicer effect than just blood
+							playsound(pos, 'sound/effects/splat.ogg', 50, 1)
+				data++
+				return
+
+		toxin/mizarudol
+			name = "Mizarudol"
+			id = "mizarudol"
+			description = "A poison that is known to degrade vision."
+			reagent_state = LIQUID
+			color = "#DB5008" // rgb: 219, 80, 8
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				if(!data) data = 1
+				switch(data)
+					if(1 to 10)
+						if(prob(19))
+							M.eye_stat += 1
+							M << "<span class='danger'>Your eyes ache.</span>"
+					if(11 to INFINITY)
+						if(prob(19))
+							M.eye_blurry = 5
+							M.eye_stat += 2
+							M << "<span class='danger'>Your eyes burn.</span>"
+							if (M.eye_stat >= 10)
+								M.disabilities |= NEARSIGHTED
+								if (prob(M.eye_stat - 10 + 1) && !(M.sdisabilities & BLIND))
+									M << "<span class='danger'>You go blind!</span>"
+									M.sdisabilities |= BLIND
+				data++
+				holder.remove_reagent(src.id, 0.3*REM)
+				return
+
+		toxin/iwazarudol
+			name = "Iwazarudol"
+			id = "iwazarudol"
+			description = "A muting poison. It takes a while to start working."
+			reagent_state = LIQUID
+			color = "#792300" // rgb: 121, 35, 0
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/carbon/M as mob)
+				if(!M) M = holder.my_atom
+				if(!data) data = 1
+				switch(data)
+					if(10 to INFINITY)
+						M.silent = max(M.silent, 10)
+				data++
+				..()
+				return
+
+
+		toxin/maizine
+			name = "Maizine"
+			id = "maizine"
+			description = "A very slow acting poison. It does not kill very fast but even small doses may be lethal if left untreated."
+			reagent_state = LIQUID
+			color = "#000067" // rgb: 0, 0, 103
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				if(!data) data = 1
+				switch(data)
+					if(10 to 20)
+						if(prob(20)) M.adjustToxLoss(1)
+					if(21 to 30)
+						if(prob(70)) M.adjustToxLoss(1)
+					if(31 to INFINITY)
+						M.adjustToxLoss(1)
+						if(prob(20)) M.adjustToxLoss(1)
+						if(prob(5))
+							M.Stun(4)
+							M.visible_message("<span class='danger'>[M] throws up!</span>")
+							M.take_organ_damage(2*REM, 0)
+							M.nutrition -= 20
+							M.adjustToxLoss(-2)
+							var/turf/pos = get_turf(M)
+							pos.add_vomit_floor(M)
+							pos.add_blood_floor(M) //again, nicer effect than just blood
+							playsound(pos, 'sound/effects/splat.ogg', 50, 1)
+				data++
+				holder.remove_reagent(src.id, 0.03*REM)
+				return
+
+		toxin/ehuadol
+			name = "Ehuadol"
+			id = "ehuadol"
+			description = "A very complex and dangerous poison."
+			reagent_state = LIQUID
+			color = "#000067" // rgb: 0, 0, 103
+			toxpwr = 1.5
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				M.take_organ_damage(1*REM, 0)
+				M.adjustCloneLoss(1*REM) //cruel!
+				M.eye_blurry = 5
+				M.eye_stat += 0.4
+				M.adjustBrainLoss(2*REM)
+
+				if (M.eye_stat >= 10)
+					M.disabilities |= NEARSIGHTED
+					if (prob(M.eye_stat - 10 + 1) && !(M.sdisabilities & BLIND))
+						M << "<span class='danger'>You go blind!</span>"
+						M.sdisabilities |= BLIND
+
+				holder.remove_reagent(src.id, 0.2*REM)
+				return
+
+		toxin/fangshenine
+			name = "Fangshenine"
+			id = "fangshenine"
+			description = "Irridiates the victim."
+			reagent_state = LIQUID
+			color = "#008000" // rgb: 0, 128, 0
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/carbon/M)
+				if(!istype(M))	return
+				if(!M) M = holder.my_atom
+				M.apply_effect(5,IRRADIATE,0)
+				..()
+				return
+			reaction_turf(var/turf/T, var/volume)
+				src = null
+				if(volume >= 1)
+					if(!istype(T, /turf/space))
+						new /obj/effect/decal/cleanable/greenglow(T)
+						return
+
+		toxin/beepsky_smash
+			name = "Beepsky Smash"
+			id = "beepskysmash"
+			description = "Deny drinking this and prepare for THE LAW."
+			reagent_state = LIQUID
+			color = "#664300" // rgb: 102, 67, 0
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/M as mob)
+				M.Stun(2)
+				..()
+				return
+
+		toxin/neurotoxin
+			name = "Neurotoxin"
+			id = "neurotoxin"
+			description = "A strong neurotoxin that puts the subject into a death-like state."
+			reagent_state = LIQUID
+			color = "#2E2E61" // rgb: 46, 46, 97
+			toxpwr = 0
+
+			on_mob_life(var/mob/living/carbon/M as mob)
+				if(!M) M = holder.my_atom
+				M.weakened = max(M.weakened, 3)
+				..()
+				return
+
+		toxin/ephedrine
+			name = "Ephedrine"
+			id = "ephedrine"
+			description = "A relatively weak drug that can boost your stamina."
+			reagent_state = LIQUID
+			color = "#792300" // rgb: 121, 35, 0
+			toxpwr = 1.5
+
+			on_mob_life(var/mob/living/carbon/M as mob)
+				if(!M) M = holder.my_atom
+				M.status_flags |= GOTTAGOFAST
+				M.hallucination += 10
+				M.drowsyness = max(M.drowsyness-3)
+				if(prob(80)) M.adjustBrainLoss(1*REM)
+				holder.remove_reagent(src.id, 0.5 * REAGENTS_METABOLISM)
+				if(isturf(M.loc) && !istype(M.loc, /turf/space))
+					if(M.canmove)
+						if(prob(10)) step(M, pick(cardinal))
+				return
+
+		toxin/methamphetamine
+			name = "Methampetamine"
+			id = "methamphetamine"
+			description = "A rather powerful drug derived from 'drines."
+			reagent_state = LIQUID
+			color = "#000067" // rgb: 0, 0, 103
+			toxpwr = 1
+
+			on_mob_life(var/mob/living/carbon/M as mob)
+				if(!M) M = holder.my_atom
+				M.status_flags |= GOTTAGOFAST
+				M.AdjustParalysis(-2)
+				M.AdjustStunned(-2)
+				M.AdjustWeakened(-2)
+				M.hallucination += 10
+				M.jitteriness = max(M.jitteriness-5,0)
+				if(prob(90)) M.adjustBrainLoss(1*REM)
+				holder.remove_reagent(src.id, REAGENTS_METABOLISM)
+				if(isturf(M.loc) && !istype(M.loc, /turf/space))
+					if(M.canmove)
+						if(prob(10)) step(M, pick(cardinal))
+				return
+
+
+		jiutin //technically a toxin, but we don't want anti toxins to remove it
+			name = "Jiutin"
+			id = "jiutin"
+			description = "A lingering, weak poison which is also known as hungry ghost poison. Can be removed from the body by eating."
+			reagent_state = LIQUID
+			color = "#D5D5FF" // rgb: 213, 213, 255
+			nutriment_factor = 50 * REAGENTS_METABOLISM //this is a lot. you can use this as a superior lipozine if you are brave
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				M.overeatduration = 0
+				if(M.nutrition <= 0) //starving!
+					if(prob(7))
+						M << "<span class='danger'>You feel extreme hunger.</span>"
+					M.adjustToxLoss(1*REM)
+				if(M.nutrition > 0) //not starving yet...
+					holder.remove_reagent(src.id, 0.5*REM)
+					M.nutrition -= nutriment_factor
+					if(M.nutrition < 0) M.nutrition = 0 //make sure it does not drop below 0
+				return
+
+		synaptidol
+			name = "Synaptidol"
+			id = "synaptidol"
+			description = "A dangerous stimulant."
+			reagent_state = LIQUID
+			color = "#C7E46E" // rgb: 199, 228, 110
+			var/metabolizespeed = 0.3
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				if(!data) data = 1
+				switch(data)
+					if(1) metabolizespeed = rand(3,12)/25
+					if(10 to 40)
+						M.drowsyness = max(M.drowsyness-5, 0)
+						M.AdjustParalysis(-1)
+						M.AdjustStunned(-1)
+						M.AdjustWeakened(-1)
+						if(prob(60)) M.adjustBrainLoss(0.5*REM)
+						if(prob(38)) M.eye_blurry = max(M.eye_blurry, 1)
+						if(prob(10)) M.emote("twitch")
+					if(41 to INFINITY)
+						M.drowsyness = max(M.drowsyness-5, 0)
+						M.AdjustParalysis(-2)
+						M.AdjustStunned(-2)
+						M.AdjustWeakened(-2)
+						if(prob(6))
+						//	M.Stun(4) Uncomment this to make the vomitting more consistant...this makes you drop your stuff though...
+							M.visible_message("<span class='danger'>[M] throws up!</span>")
+							M.take_organ_damage(2*REM, 0)
+							M.nutrition -= 20
+							M.adjustToxLoss(-2)
+							var/turf/pos = get_turf(M)
+							pos.add_vomit_floor(M)
+							playsound(pos, 'sound/effects/splat.ogg', 50, 1)
+						if(prob(80)) M.adjustBrainLoss(1*REM)
+						if(prob(80))
+							M.eye_stat += 0.2
+							if (M.eye_stat >= 10)
+								M.disabilities |= NEARSIGHTED
+								if (prob(M.eye_stat - 10 + 1) && !(M.sdisabilities & BLIND))
+									M << "<span class='danger'>You go blind!</span>"
+									M.sdisabilities |= BLIND
+						if(prob(20)) M.adjustCloneLoss(0.5*REM)
+						if(prob(75)) M.take_organ_damage(0.5*REM, 0)
+				if(prob(80)) holder.remove_reagent(src.id, metabolizespeed*REM)
+				if(holder.has_reagent("fuel"))
+					holder.remove_reagent(src.id, 5*REM)
+				data++
+				return
+
+		toxin/synchrozine
+			name = "Synchrozine"
+			id = "synchrozine"
+			description = "Apparently fixes brain damage, but is it really worth it?"
+			reagent_state = LIQUID
+			color = "#49E20E" // rgb: 73, 226, 14
+			toxpwr = 0.5
+
+			on_mob_life(var/mob/living/M as mob)
+				if (M.stat == 2.0)
+					return
+				if(!M) M = holder.my_atom
+				if(prob(70)) M.adjustBrainLoss(-3*REM)
+				if(prob(50)) // you will literally never stop vomiting
+					M.visible_message("<span class='danger'>[M] throws up!</span>")
+					M.take_organ_damage(2*REM, 0)
+					var/turf/pos = get_turf(M)
+					pos.add_vomit_floor(M)
+					pos.add_blood_floor(M)
+					playsound(pos, 'sound/effects/splat.ogg', 50, 1)
+				data++
+				..()
+				return
+
 /////////////////////////Coloured Crayon Powder////////////////////////////
 //For colouring in /proc/mix_color_from_reagents
 
@@ -1947,6 +2358,22 @@ datum
 				if(prob(5))
 					M.visible_message("<span class='warning'>[M] [pick("dry heaves!","coughs!","splutters!")]</span>")
 				..()
+				return
+
+		blazeoil
+			name = "Blaze Oil"
+			id = "blazeoil"
+			description = "Causes spontanous combustion when ingested."
+			reagent_state = LIQUID
+			color = "#B31008" // rgb: 179, 16, 8
+
+			on_mob_life(var/mob/living/M as mob)
+				if(!M) M = holder.my_atom
+				if(prob(20))
+					M.fire_stacks = min(10,M.fire_stacks + 4)
+					M.IgniteMob()
+					M << "<span class='danger'>You suddenly ignite!</span>"
+				holder.remove_reagent(src.id, 0.2*REM)
 				return
 
 		frostoil
@@ -2787,31 +3214,6 @@ datum
 				..()
 				return
 
-		neurotoxin
-			name = "Neurotoxin"
-			id = "neurotoxin"
-			description = "A strong neurotoxin that puts the subject into a death-like state."
-			reagent_state = LIQUID
-			color = "#2E2E61" // rgb: 46, 46, 97
-
-			on_mob_life(var/mob/living/carbon/M as mob)
-				if(!M) M = holder.my_atom
-				M.weakened = max(M.weakened, 3)
-				if(!data) data = 1
-				data++
-				M.dizziness +=6
-				if(data >= 15 && data <45)
-					if (!M.stuttering) M.stuttering = 1
-					M.stuttering += 3
-				else if(data >= 45 && prob(50) && data <55)
-					M.confused = max(M.confused+3,0)
-				else if(data >=55)
-					M.druggy = max(M.druggy, 55)
-				else if(data >=200)
-					M.adjustToxLoss(2)
-				..()
-				return
-
 		hippies_delight
 			name = "Hippie's Delight"
 			id = "hippiesdelight"
@@ -3159,19 +3561,6 @@ datum
 				..()
 				return
 
-		ethanol/beepsky_smash
-			name = "Beepsky Smash"
-			id = "beepskysmash"
-			description = "Deny drinking this and prepare for THE LAW."
-			reagent_state = LIQUID
-			color = "#664300" // rgb: 102, 67, 0
-			boozepwr = 25
-
-			on_mob_life(var/mob/living/M as mob)
-				M.Stun(2)
-				..()
-				return
-
 		ethanol/irish_cream
 			name = "Irish Cream"
 			id = "irishcream"
@@ -3480,6 +3869,23 @@ datum
 					M.heal_organ_damage(1,1)
 					..()
 					return
+
+		ethanol/bathsalts // not even stolen from goon tho
+			name = "Bath salts"
+			id = "bathsalts"
+			description = "A horrible drug from the depths of the space slums. Practice caution when consuming!"
+			nutriment_factor = 1 * REAGENTS_METABOLISM
+			color = "#FFFFFF" // rgb: 255, 255, 255
+			boozepwr = 1
+
+			on_mob_life(var/mob/living/M as mob)
+				M.nutrition += nutriment_factor
+				M.AdjustParalysis(-0.5)
+				M.AdjustStunned(-0.5)
+				M.AdjustWeakened(-0.5)
+				..()
+				return
+
 
 // Undefine the alias for REAGENTS_EFFECT_MULTIPLER
 #undef REM
