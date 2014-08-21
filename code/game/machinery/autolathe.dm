@@ -72,6 +72,10 @@ var/global/list/autolathe_recipes_hidden = list( \
 		/* new /obj/item/weapon/shield/riot(), */ \
 	)
 
+var/global/list/autolathe_recipes_emagged = list( \
+		new /obj/item/weapon/silencer(), \
+	)
+
 /obj/machinery/autolathe
 	name = "autolathe"
 	desc = "It produces items using metal and glass."
@@ -88,6 +92,7 @@ var/global/list/autolathe_recipes_hidden = list( \
 	anchored = 1.0
 	var/list/L = list()
 	var/list/LL = list()
+	var/list/LLL = list()
 	var/hacked = 0
 	var/disabled = 0
 	var/shocked = 0
@@ -115,6 +120,7 @@ var/global/list/autolathe_recipes_hidden = list( \
 	wires = new(src)
 	src.L = autolathe_recipes
 	src.LL = autolathe_recipes_hidden
+	src.LLL = autolathe_recipes_emagged
 
 /obj/machinery/autolathe/interact(mob/user)
 	if(..())
@@ -151,6 +157,15 @@ var/global/list/autolathe_recipes_hidden = list( \
 		else
 			attack_hand(user)
 			return 1
+			
+	else if(istype(O, /obj/item/weapon/card/emag) && !emagged)
+		src.emagged = 1
+		var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread
+		s.set_up(5, 1, src)
+		s.start()
+		user << "You short out the [src]'s circuit board, enabling debug mode."
+		visible_message("\red BZZzZZzZZzZT")
+		return
 
 	if (src.m_amount + O.m_amt > max_m_amount)
 		user << "<span class=\"alert\">The autolathe is full. Please remove metal from the autolathe in order to insert more.</span>"
@@ -214,7 +229,7 @@ var/global/list/autolathe_recipes_hidden = list( \
 			if(!attempting_to_build)
 				return
 
-			if(locate(attempting_to_build, src.L) || locate(attempting_to_build, src.LL)) // see if the requested object is in one of the construction lists, if so, it is legit -walter0o
+			if(locate(attempting_to_build, src.L) || locate(attempting_to_build, src.LL) || locate(attempting_to_build, src.LLL)) // see if the requested object is in one of the construction lists, if so, it is legit -walter0o
 				template = attempting_to_build
 
 			else // somebody is trying to exploit, alert admins -walter0o
@@ -293,6 +308,8 @@ var/global/list/autolathe_recipes_hidden = list( \
 		objs += src.L
 		if(src.hacked)
 			objs += src.LL
+		if(src.emagged)
+			objs += src.LLL
 		for(var/obj/t in objs)
 			if(disabled || m_amount<t.m_amt || g_amount<t.g_amt)
 				dat += replacetext("<span class='linkOff'>[t]</span>", "The ", "")
