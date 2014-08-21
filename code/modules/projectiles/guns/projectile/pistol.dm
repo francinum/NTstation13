@@ -94,18 +94,6 @@
 	origin_tech = "combat=4;materials=3"
 	mag_type = /obj/item/ammo_box/magazine/m9mm
 
-/*
-/obj/item/weapon/gun/projectile/automatic/pistol/glock/attackby(obj/item/I as obj, mob/user as mob)
-	if(istype(I, /obj/item/weapon/silencer))
-		return silencer_attackby(I,user)
-	return ..()
-
-/obj/item/weapon/gun/projectile/automatic/pistol/glock/update_icon()
-	..()
-	icon_state = "glock[silenced ? "-silencer" : ""][chambered ? "" : "-e"]"
-	return
-*/
-
 /obj/item/weapon/gun/projectile/automatic/deagle/m1911
 	name = "\improper M1911"
 	desc = "An M1911 pistol. Uses .45 ammo."
