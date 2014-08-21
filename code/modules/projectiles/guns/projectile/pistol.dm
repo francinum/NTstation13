@@ -86,6 +86,25 @@
 	icon_state = "[initial(icon_state)][silenced ? "-silencer" : ""][chambered ? "" : "-e"]"
 	return
 
+/obj/item/weapon/gun/projectile/automatic/pistol/glock
+	name = "glock"
+	desc = "A Glock pistol. Uses 9mm ammo."
+	icon_state = "glock"
+	force = 10.0
+	origin_tech = "combat=4;materials=3"
+	mag_type = /obj/item/ammo_box/magazine/m9mm
+
+/*
+/obj/item/weapon/gun/projectile/automatic/pistol/glock/attackby(obj/item/I as obj, mob/user as mob)
+	if(istype(I, /obj/item/weapon/silencer))
+		return silencer_attackby(I,user)
+	return ..()
+
+/obj/item/weapon/gun/projectile/automatic/pistol/glock/update_icon()
+	..()
+	icon_state = "glock[silenced ? "-silencer" : ""][chambered ? "" : "-e"]"
+	return
+*/
 
 /obj/item/weapon/gun/projectile/automatic/deagle/m1911
 	name = "\improper M1911"
@@ -94,14 +113,6 @@
 	force = 13.0
 	origin_tech = "combat=4;materials=4"
 	mag_type = /obj/item/ammo_box/magazine/sm45
-
-/obj/item/weapon/gun/projectile/automatic/deagle/glock
-	name = "glock"
-	desc = "A glock pistol. Uses 9mm ammo."
-	icon_state = "glock"
-	force = 10.0
-	origin_tech = "combat=4;materials=3"
-	mag_type = /obj/item/ammo_box/magazine/m9mm
 
 /obj/item/glockbarrel
 	name = "handgun barrel"
@@ -129,7 +140,7 @@
 	if(istype(W,/obj/item/weapon/screwdriver))
 		if(construction)
 			user << "You finish the handgun."
-			new /obj/item/weapon/gun/projectile/automatic/deagle/glock(user.loc)
+			new /obj/item/weapon/gun/projectile/automatic/pistol/glock(user.loc)
 			del(src)
 			return
 
@@ -160,3 +171,4 @@
 	icon_state = "silencer"
 	w_class = 2
 	var/oldsound = 0 //Stores the true sound the gun made before it was silenced
+	m_amt = 200000
