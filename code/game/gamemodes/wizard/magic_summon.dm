@@ -89,7 +89,7 @@
 					if("stunrevolver")
 						new /obj/item/weapon/gun/energy/stunrevolver(get_turf(H))
 					if("glock")
-						new /obj/item/weapon/gun/projectile/automatic/deagle/glock(get_turf(H))
+						new /obj/item/weapon/gun/projectile/automatic/pistol/glock(get_turf(H))
 					if("m1911")
 						new /obj/item/weapon/gun/projectile/automatic/deagle/m1911(get_turf(H))
 
